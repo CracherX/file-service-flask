@@ -1,6 +1,8 @@
 Flask==2.2.2
 psycopg2-binary==2.9.1
-uwsgi==2.0.20
+uwsgi
 requests>=2.26.0
 SQLAlchemy==1.4.17
 pyyaml==6.0.1
+dataclass-factory==2.13
+python-logstash==0.4.6
