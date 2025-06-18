@@ -6,9 +6,9 @@ import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy_utils import database_exists, create_database
 
-from .config import config
+from config import config
 
-from ..base_module import (
+from src.base_module import (
     ModuleException,
     ClassesLoggerAdapter,
     ThreadIsolatedSingleton,

@@ -1,6 +1,6 @@
 import flask
 
-from ..injectors import files
+from injectors import files
 
 file_router = flask.Blueprint(
     'tasks', __name__, url_prefix='/api/'

@@ -1,0 +1,17 @@
+app_host: "0.0.0.0"
+app_port: 80
+
+pg:
+  host: "postgres"
+  port: 5432
+  user: "your_user"
+  password: "your_password"
+  database: "your_db"
+
+logging:
+  root_log_level: 10
+  modules:
+    - name: "files"
+      log_level: 20
+
+upload_dir: "/uploads"

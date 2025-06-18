@@ -3,7 +3,8 @@ import os
 import flask
 
 from base_module import setup_logging, FormatDumps, ModuleException
-from injectors import config, pg
+from injectors import pg
+from config import config
 from routers import file_router
 
 

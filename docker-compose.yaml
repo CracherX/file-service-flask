@@ -5,23 +5,23 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_DB: ${DB}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: 123
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT}:5432"
+      - "5432:5432"
 
   web:
     build: .
     restart: always
-    env_file:
-      - .env
     ports:
       - "80:80"
     depends_on:
       - db
+    volumes:
+      - ./config.yaml:/config.yaml
     command: uwsgi --ini ../uwsgi.ini
 
 volumes:

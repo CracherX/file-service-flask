@@ -1,6 +1,6 @@
 from config import config
-from ..services.files import FilesService
-from pg import pg
+from .pg import pg
+from services import FilesService
 
 
 def files() -> FilesService:

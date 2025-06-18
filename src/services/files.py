@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Session as PGSession
 
-from src.base_module import ClassesLoggerAdapter
-from src.models import Files
+from base_module import ClassesLoggerAdapter
+from models import Files
 
 
 class FilesService:
