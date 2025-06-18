@@ -5,6 +5,6 @@ from services import FilesService
 
 def files() -> FilesService:
     return FilesService(
-        pg_connection=pg,
+        pg_connection=pg.acquire_session(),
         upload_dir=config.upload_dir,
     )
