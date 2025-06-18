@@ -1,8 +1,5 @@
-"""."""
 import dataclasses as dc
 import os
-
-import yaml
 
 from src.base_module import (
     Model,
@@ -15,10 +12,9 @@ from src.base_module import (
 class ServiceConfig(Model):
     """."""
 
-    pg: FilePgConfig = dc.field(default=FilePgConfig())
-    logging: LoggerConfig = dc.field(default=None)
+    app_host: str = os.getenv('APP_HOST', '0.0.0.0')
+    app_port: int = os.getenv('APP_PORT', 80)
+    pg: FilePgConfig = dc.field(default_factory=FilePgConfig)
+    logging: LoggerConfig = dc.field(default_factory=LoggerConfig)
+    upload_dir: str = dc.field(default=os.getenv('UPLOAD_DIR', '/uploads'))
 
-
-config: ServiceConfig = ServiceConfig.load(
-    yaml.safe_load(open(os.getenv('YAML_PATH', '/config.yaml'))) or {}
-)

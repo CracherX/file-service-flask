@@ -1,0 +1,8 @@
+app_host: localhost
+app_port: 80
+pg:
+  host: db
+  port: 5432
+  user: test
+  password: 123
+  database: test

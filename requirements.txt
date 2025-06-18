@@ -1,10 +1,10 @@
 Flask==2.2.2
-psycopg2-binary==2.9.1
-uwsgi
+psycopg2-binary==2.9.9
+Werkzeug==2.2.2
+uwsgi==2.0.23
 requests>=2.26.0
 SQLAlchemy==1.4.17
 SQLAlchemy-Utils==0.41.1
 pyyaml==6.0.1
 dataclass-factory==2.13
 python-logstash==0.4.6
-Shapely

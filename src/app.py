@@ -2,10 +2,9 @@ import os
 
 import flask
 
-import routers
-from config import config
 from base_module import setup_logging, FormatDumps, ModuleException
-from injectors.connections import pg
+from injectors import config, pg
+from routers import file_router
 
 
 def setup_app():
@@ -13,18 +12,12 @@ def setup_app():
     current.json_encoder = FormatDumps
     pg.setup(current)
     setup_logging(config.logging, FormatDumps)
-    oms_setup_routers(
-        app=current,
-        config=config.config_data,
-        static_dir=config.static_dir,
-        mv=middleware.oms_middleware
-    )
+    current.register_blueprint(file_router)
 
     return current
 
 
 app = setup_app()
-app.register_blueprint(routers.tasks_routers)
 
 
 @app.errorhandler(ModuleException)
@@ -38,6 +31,6 @@ def handle_app_exception(e: ModuleException):
 
 if __name__ == '__main__':
     app.run(
-        host=os.getenv('APP_HOST', '0.0.0.0'),
-        port=os.getenv('APP_PORT', 80)
+        host=os.getenv('HOST', '0.0.0.0'),
+        port=os.getenv('PORT', 80),
     )
