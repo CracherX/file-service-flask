@@ -9,9 +9,12 @@ file_router = flask.Blueprint(
 @file_router.get('/files/')
 def get_files():
     """."""
-    # TODO: не забыть URL параметры
     fs = files()
-    res = fs.list_files()
+    res = fs.list_files(
+            page=flask.request.args.get('page'),
+            page_size=flask.request.args.get('page_size'),
+            path_contains=flask.request.args.get('path_contains'),
+    )
     return flask.jsonify(res)
 
 @file_router.get('/file/<int:file_id>')
