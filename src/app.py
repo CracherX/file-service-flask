@@ -13,7 +13,6 @@ def setup_app():
     current = flask.Flask(__name__)
     current.json_encoder = FormatDumps
     setup_logging(config.logging, FormatDumps)
-    print("Tables in metadata after mapped in model:", BaseOrmMappedModel.REGISTRY.metadata.tables.keys())
     pg.setup(current)
     return current
 
