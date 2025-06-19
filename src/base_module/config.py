@@ -27,3 +27,4 @@ class FilePgConfig(PgConfig):
     user: str = dc.field(default=os.getenv('STORAGES_PGSQL_USER'))
     password: str = dc.field(default=os.getenv('STORAGES_PGSQL_PASS'))
     database: str = dc.field(default=os.getenv('STORAGES_PGSQL_ORBISMAP_DB'))
+

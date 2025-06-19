@@ -18,7 +18,7 @@ class FilesService:
 
     def list_files(
             self,
-            page: int = 0,
+            page: int = 1,
             page_size: int = 100,
             path_contains: Optional[str] = None
     ) -> List[Files]:

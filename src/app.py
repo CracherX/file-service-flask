@@ -2,7 +2,8 @@ import os
 
 import flask
 
-from base_module import setup_logging, FormatDumps, ModuleException
+from base_module import setup_logging, FormatDumps, ModuleException, BaseOrmMappedModel
+from models import Files #noqa
 from injectors import pg
 from config import config
 from routers import file_router
@@ -11,14 +12,14 @@ from routers import file_router
 def setup_app():
     current = flask.Flask(__name__)
     current.json_encoder = FormatDumps
-    pg.setup(current)
     setup_logging(config.logging, FormatDumps)
-    current.register_blueprint(file_router)
-
+    print("Tables in metadata after mapped in model:", BaseOrmMappedModel.REGISTRY.metadata.tables.keys())
+    pg.setup(current)
     return current
 
 
 app = setup_app()
+app.register_blueprint(file_router)
 
 
 @app.errorhandler(ModuleException)

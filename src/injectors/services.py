@@ -1,5 +1,5 @@
 from config import config
-from .pg import pg
+from .connections import pg
 from services import FilesService
 
 

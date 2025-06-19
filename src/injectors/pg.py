@@ -7,8 +7,9 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy_utils import database_exists, create_database
 
 from config import config
+from models import Files #noqa
 
-from src.base_module import (
+from base_module import (
     ModuleException,
     ClassesLoggerAdapter,
     ThreadIsolatedSingleton,
@@ -141,8 +142,3 @@ class PgConnectionInj(metaclass=ThreadIsolatedSingleton):
     def setup(self, app: flask.Flask):
         self.init_db()
         app.after_request(self._disconnect)
-
-
-pg = PgConnectionInj(
-    conf=config.pg,
-)
