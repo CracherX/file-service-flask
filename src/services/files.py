@@ -191,7 +191,12 @@ class FilesService:
             return None
 
         base_dir = Path(__file__).resolve().parent.parent
-        full_path = base_dir / self._upload / file.path / f'{file.name}.{file.extension}' #TODO
+
+        full_path = base_dir / self._upload / file.path
+        if file.extension != '':
+            full_path = full_path / f'{file.name}'
+        else:
+            full_path = full_path / f'{file.name}.{file.extension}'
 
         if not full_path.exists():
             self._logger.warning(
