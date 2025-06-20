@@ -6,16 +6,18 @@ file_router = flask.Blueprint(
     'tasks', __name__, url_prefix='/api/'
 )
 
+
 @file_router.get('/files')
 def get_files():
     """."""
     fs = files()
     res = fs.list_files(
-            page=int(flask.request.args.get('page')),
-            page_size=int(flask.request.args.get('page_size')),
-            path_contains=flask.request.args.get('path_contains'),
+        page=int(flask.request.args.get('page')),
+        page_size=int(flask.request.args.get('page_size')),
+        path_contains=flask.request.args.get('path_contains'),
     )
     return flask.jsonify(res)
+
 
 @file_router.get('/file/<int:file_id>')
 def get_file(file_id):
@@ -24,12 +26,14 @@ def get_file(file_id):
     res = fs.get_file(file_id)
     return flask.jsonify(res)
 
+
 @file_router.delete('/file/<int:file_id>')
 def delete_file(file_id):
     """."""
     fs = files()
     deleted = fs.delete_file(file_id)
     return flask.jsonify({'deleted': deleted})
+
 
 @file_router.post('/file')
 def create_file():
@@ -39,8 +43,9 @@ def create_file():
         flask.request.files.get('upload'),
         flask.request.form.get('path'),
         flask.request.form.get('comment'),
-                         )
+    )
     return flask.jsonify(res)
+
 
 @file_router.get('/file/<int:file_id>/download')
 def download_file(file_id):
@@ -52,6 +57,7 @@ def download_file(file_id):
         download_name=res.get('name'),
         mimetype="application/octet-stream",
     )
+
 
 @file_router.patch('/file')
 def update_file():

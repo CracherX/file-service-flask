@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy_utils import database_exists, create_database
 
 from config import config
-from models import Files #noqa
+from models import Files  # noqa
 
 from base_module import (
     ModuleException,

@@ -3,7 +3,7 @@ import os
 import flask
 
 from base_module import setup_logging, FormatDumps, ModuleException, BaseOrmMappedModel
-from models import Files #noqa
+from models import Files  # noqa
 from injectors import pg
 from config import config
 from routers import file_router

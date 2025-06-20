@@ -19,6 +19,7 @@ class ServiceConfig(Model):
     logging: LoggerConfig = dc.field(default_factory=LoggerConfig)
     upload_dir: str = dc.field(default=os.getenv('UPLOAD_DIR', '/uploads'))
 
+
 config: ServiceConfig = ServiceConfig.load(
     yaml.safe_load(open(os.getenv('YAML_PATH', '/config.yaml'))) or {}
 )
