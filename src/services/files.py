@@ -41,19 +41,35 @@ class FilesService:
 
     def list_files(
             self,
-            page: int = 1,
-            page_size: int = 100,
+            page: str = 1,
+            page_size: str = 100,
             prefix: Optional[str] = None
     ) -> List[Files]:
-        offset = (page - 1) * page_size
+
         self._logger.info(
             'Запрошен список файлов',
             extra={
-                'offset': offset,
                 'page': page,
                 'page_size': page_size
             }
         )
+        try:
+            page = int(page)
+            page_size = int(page_size)
+        except:
+            self._logger.info(
+                "Ошибка в параметрах URL",
+                extra={
+                    'page': page,
+                    'page_size': page_size
+                }
+            )
+            raise ModuleException(
+                "Параметры не являются числами или не указаны вовсе",
+                code=400
+            )
+
+        offset = (page - 1) * page_size
         query = self._pg.query(Files)
         if prefix:
             query = query.filter(Files.path.contains(prefix))

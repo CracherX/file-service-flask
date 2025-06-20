@@ -8,12 +8,12 @@ file_router = flask.Blueprint(
 
 
 @file_router.get('/file/')
-def get_files(files1=files()):
+def get_files():
     """."""
-    fs = files1
+    fs = files()
     res = fs.list_files(
-        page=int(flask.request.args.get('page')),
-        page_size=int(flask.request.args.get('page_size')),
+        page=flask.request.args.get('page'),
+        page_size=flask.request.args.get('page_size'),
         prefix=flask.request.args.get('prefix'),
     )
     return flask.jsonify(res)

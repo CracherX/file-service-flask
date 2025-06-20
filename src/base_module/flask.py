@@ -4,7 +4,7 @@ from uuid import UUID
 
 import flask
 
-from . import Model
+from .model import Model
 
 
 class FormatDumps(flask.json.JSONEncoder):
