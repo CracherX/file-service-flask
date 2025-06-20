@@ -43,7 +43,7 @@ class FilesService:
             self,
             page: int = 1,
             page_size: int = 100,
-            path_contains: Optional[str] = None
+            prefix: Optional[str] = None
     ) -> List[Files]:
         offset = (page - 1) * page_size
         self._logger.info(
@@ -55,8 +55,8 @@ class FilesService:
             }
         )
         query = self._pg.query(Files)
-        if path_contains:
-            query = query.filter(Files.path.contains(path_contains))
+        if prefix:
+            query = query.filter(Files.path.contains(prefix))
         return query.offset(offset).limit(page_size).all()
 
     def get_file(self, file_id: int) -> Files | None:
@@ -179,7 +179,7 @@ class FilesService:
         self._pg.refresh(file)
         return file
 
-    def download_file(self, file_id: int) -> dict[str, str] | None:
+    def download_file(self, file_id: int) -> tuple[str, str] | None:
         self._logger.info(
             'Запрос на скачивание файла',
             extra={'file_id': file_id},
@@ -211,10 +211,8 @@ class FilesService:
             'Файл готов к скачиванию',
             extra={'file_id': file_id},
         )
-        return {
-            'path': str(full_path),
-            'name': f'{file.name}.{file.extension}',
-        }
+        return str(full_path), f'{file.name}.{file.extension}'
+
 
     def update_file(self, file_id, data) -> Files | None:
         data = UpdateModel.load(data)

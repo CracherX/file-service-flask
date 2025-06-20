@@ -3,23 +3,23 @@ import flask
 from injectors import files
 
 file_router = flask.Blueprint(
-    'tasks', __name__, url_prefix='/api/'
+    'files', __name__, url_prefix='/api/files'
 )
 
 
-@file_router.get('/files')
+@file_router.get('/file/')
 def get_files(files1=files()):
     """."""
     fs = files1
     res = fs.list_files(
         page=int(flask.request.args.get('page')),
         page_size=int(flask.request.args.get('page_size')),
-        path_contains=flask.request.args.get('path_contains'),
+        prefix=flask.request.args.get('prefix'),
     )
     return flask.jsonify(res)
 
 
-@file_router.get('/file/<int:file_id>')
+@file_router.get('/file/<int:file_id>/')
 def get_file(file_id):
     """."""
     fs = files()
@@ -27,7 +27,7 @@ def get_file(file_id):
     return flask.jsonify(res)
 
 
-@file_router.delete('/file/<int:file_id>')
+@file_router.delete('/file/<int:file_id>/')
 def delete_file(file_id):
     """."""
     fs = files()
@@ -35,7 +35,7 @@ def delete_file(file_id):
     return flask.jsonify({'deleted': deleted})
 
 
-@file_router.post('/file')
+@file_router.post('/file/')
 def create_file():
     """."""
     fs = files()
@@ -47,19 +47,19 @@ def create_file():
     return flask.jsonify(res)
 
 
-@file_router.get('/file/<int:file_id>/download')
+@file_router.get('/file/<int:file_id>/download/')
 def download_file(file_id):
     """."""
     fs = files()
-    res = fs.download_file(file_id)
+    path, filename = fs.download_file(file_id)
     return flask.send_file(
-        path_or_file=res.get('path'),
-        download_name=res.get('name'),
+        path_or_file=path,
+        download_name=filename,
         mimetype="application/octet-stream",
     )
 
 
-@file_router.patch('/file/<int:file_id>')
+@file_router.patch('/file/<int:file_id>/')
 def update_file(file_id):
     """."""
     fs = files()
