@@ -15,26 +15,20 @@ from models import Files
 @dc.dataclass
 class CreationModel(Model):
     """."""
-    name: str = dc.field(metadata={'required': True})
-    extension: Optional[str] = dc.field(metadata={'required': False})
-    size: int = dc.field(metadata={'required': True})
-    path: str = dc.field(metadata={'required': True})
-    comment: Optional[str] = dc.field(metadata={'required': False})
+    name: str = dc.field()
+    extension: Optional[str] = dc.field()
+    size: int = dc.field()
+    path: str = dc.field()
+    comment: Optional[str] = dc.field()
 
 
 @dc.dataclass
 class UpdateModel(Model):
     """."""
-    file_id: int = dc.field(metadata={'required': True})
-    name: Optional[str] = dc.field(metadata={'required': False})
-    path: Optional[str] = dc.field(metadata={'required': False})
-    comment: Optional[str] = dc.field(metadata={'required': False})
-
-
-class DownloadModel(Model):
-    """."""
-    path: str = dc.field(metadata={'required': True})
-    filename: str = dc.field(metadata={'required': True})
+    id: int = dc.field()
+    name: Optional[str] = dc.field(default=None)
+    path: Optional[str] = dc.field(default=None)
+    comment: Optional[str] = dc.field(default=None)
 
 
 class FilesService:
@@ -229,13 +223,13 @@ class FilesService:
         data = UpdateModel.load(data)
         self._logger.info(
             'Начало обновления файла',
-            extra={'file_id': data.file_id},
+            extra={'file_id': data.id},
         )
-        file = self.get_file(data.file_id)
+        file = self.get_file(data.id)
         if not file:
             self._logger.info(
                 'Указанный файл не найден',
-                extra={'file_id': data.file_id},
+                extra={'file_id': data.id},
             )
             return None
 
@@ -253,7 +247,7 @@ class FilesService:
         if file.extension != '':
             new_file_path = new_file_path / f'{new_name}.{file.extension}'
         else:
-            new_file_path = new_file_path / f'{new_name}'
+            new_file_path = new_file_path / new_name
 
         if data.name or data.path:
             if old_path.exists():
@@ -261,7 +255,7 @@ class FilesService:
                 self._logger.info(
                     'Файл перемещен',
                     extra={
-                        'file_id': data.file_id,
+                        'file_id': data.id,
                         'old_path': old_path,
                         'new_path': new_file_path,
                     },
@@ -272,9 +266,11 @@ class FilesService:
                     extra={'old_file_path': old_path}
                 )
 
-        file.name = data.name
-        file.path = data.path
-        file.comment = data.comment
+        tf = {f.name for f in dc.fields(file)}
+        for f in dc.fields(data):
+            value = getattr(data, f.name)
+            if value is not None:
+                setattr(file, f.name, value)
         file.updated_at = datetime.now(UTC)
 
         self._pg.commit()
@@ -282,6 +278,6 @@ class FilesService:
 
         self._logger.info(
             'Файл обновлён в базе данных',
-            extra={'file_id': data.file_id},
-                          )
+            extra={'file_id': data.id},
+        )
         return file
