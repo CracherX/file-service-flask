@@ -59,9 +59,9 @@ def download_file(file_id):
     )
 
 
-@file_router.patch('/file')
-def update_file():
+@file_router.patch('/file/<int:file_id>')
+def update_file(file_id):
     """."""
     fs = files()
-    res = fs.update_file(flask.request.json)
+    res = fs.update_file(file_id ,flask.request.json)
     return flask.jsonify(res)

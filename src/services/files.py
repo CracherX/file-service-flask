@@ -24,7 +24,6 @@ class CreationModel(Model):
 @dc.dataclass
 class UpdateModel(Model):
     """."""
-    id: int = dc.field()
     name: Optional[str] = dc.field(default=None)
     path: Optional[str] = dc.field(default=None)
     comment: Optional[str] = dc.field(default=None)
@@ -217,17 +216,17 @@ class FilesService:
             'name': f'{file.name}.{file.extension}',
         }
 
-    def update_file(self, data) -> Files | None:
+    def update_file(self, file_id, data) -> Files | None:
         data = UpdateModel.load(data)
         self._logger.info(
             'Начало обновления файла',
-            extra={'file_id': data.id},
+            extra={'file_id': file_id},
         )
-        file = self.get_file(data.id)
+        file = self.get_file(file_id)
         if not file:
             self._logger.info(
                 'Указанный файл не найден',
-                extra={'file_id': data.id},
+                extra={'file_id': file_id},
             )
             return None
 
@@ -253,7 +252,7 @@ class FilesService:
                 self._logger.info(
                     'Файл перемещен',
                     extra={
-                        'file_id': data.id,
+                        'file_id': file_id,
                         'old_path': old_path,
                         'new_path': new_file_path,
                     },
@@ -275,6 +274,6 @@ class FilesService:
 
         self._logger.info(
             'Файл обновлён в базе данных',
-            extra={'file_id': data.id},
+            extra={'file_id': file_id},
         )
         return file
