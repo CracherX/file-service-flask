@@ -6,7 +6,7 @@ file_router = flask.Blueprint(
     'tasks', __name__, url_prefix='/api/'
 )
 
-@file_router.get('/files/')
+@file_router.get('/files')
 def get_files():
     """."""
     fs = files()
@@ -52,3 +52,10 @@ def download_file(file_id):
         download_name=res.get('name'),
         mimetype="application/octet-stream",
     )
+
+@file_router.patch('/file')
+def update_file():
+    """."""
+    fs = files()
+    res = fs.update_file(flask.request.json)
+    return flask.jsonify(res)

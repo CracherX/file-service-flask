@@ -1,6 +1,8 @@
 import os
 import dataclasses as dc
+from datetime import datetime, UTC
 from pathlib import Path
+from shutil import move
 from typing import Optional, List
 from uuid import uuid4
 
@@ -17,6 +19,15 @@ class CreationModel(Model):
     extension: Optional[str] = dc.field(metadata={'required': False})
     size: int = dc.field(metadata={'required': True})
     path: str = dc.field(metadata={'required': True})
+    comment: Optional[str] = dc.field(metadata={'required': False})
+
+
+@dc.dataclass
+class UpdateModel(Model):
+    """."""
+    file_id: int = dc.field(metadata={'required': True})
+    name: Optional[str] = dc.field(metadata={'required': False})
+    path: Optional[str] = dc.field(metadata={'required': False})
     comment: Optional[str] = dc.field(metadata={'required': False})
 
 
@@ -56,7 +67,7 @@ class FilesService:
             query = query.filter(Files.path.contains(path_contains))
         return query.offset(offset).limit(page_size).all()
 
-    def get_file(self, file_id: int) -> Files:
+    def get_file(self, file_id: int) -> Files | None:
         self._logger.info(
             'Запрошен файл',
             extra={
@@ -194,9 +205,9 @@ class FilesService:
 
         full_path = base_dir / self._upload / file.path
         if file.extension != '':
-            full_path = full_path / f'{file.name}'
-        else:
             full_path = full_path / f'{file.name}.{file.extension}'
+        else:
+            full_path = full_path / file.name
 
         if not full_path.exists():
             self._logger.warning(
@@ -214,4 +225,63 @@ class FilesService:
             'name': f'{file.name}.{file.extension}',
         }
 
+    def update_file(self, data) -> Files | None:
+        data = UpdateModel.load(data)
+        self._logger.info(
+            'Начало обновления файла',
+            extra={'file_id': data.file_id},
+        )
+        file = self.get_file(data.file_id)
+        if not file:
+            self._logger.info(
+                'Указанный файл не найден',
+                extra={'file_id': data.file_id},
+            )
+            return None
 
+        old_path = Path(__file__).resolve().parent.parent / self._upload / file.path
+        if file.extension != '':
+            old_path = old_path / f'{file.name}.{file.extension}'
+        else:
+            old_path = old_path / file.name
+
+        new_name = data.name or file.name
+        new_path = data.path or file.path
+        new_file_path = Path(__file__).resolve().parent.parent / self._upload / new_path
+        new_file_path.mkdir(parents=True, exist_ok=True)
+
+        if file.extension != '':
+            new_file_path = new_file_path / f'{new_name}.{file.extension}'
+        else:
+            new_file_path = new_file_path / f'{new_name}'
+
+        if data.name or data.path:
+            if old_path.exists():
+                move(str(old_path), str(new_file_path))
+                self._logger.info(
+                    'Файл перемещен',
+                    extra={
+                        'file_id': data.file_id,
+                        'old_path': old_path,
+                        'new_path': new_file_path,
+                    },
+                )
+            else:
+                self._logger.warning(
+                    'Старый файл не найден на диске',
+                    extra={'old_file_path': old_path}
+                )
+
+        file.name = data.name
+        file.path = data.path
+        file.comment = data.comment
+        file.updated_at = datetime.now(UTC)
+
+        self._pg.commit()
+        self._pg.refresh(file)
+
+        self._logger.info(
+            'Файл обновлён в базе данных',
+            extra={'file_id': data.file_id},
+                          )
+        return file
