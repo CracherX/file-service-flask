@@ -1,12 +1,17 @@
 import dataclasses as dc
 import os
 from datetime import datetime, UTC
+from fileinput import close
 from pathlib import Path
 from shutil import move
 from typing import Optional, List
 from uuid import uuid4
 
-from base_module import ClassesLoggerAdapter, Model
+from base_module import (
+    ClassesLoggerAdapter,
+    Model,
+    ModuleException
+)
 from models import Files
 from sqlalchemy.orm import Session as PGSession
 
@@ -84,7 +89,7 @@ class FilesService:
         )
         return self._pg.query(Files).filter(Files.id == file_id).first()
 
-    def delete_file(self, file_id: int) -> bool:
+    def delete_file(self, file_id: int) -> None:
         self._logger.info(
             'Удаление файла',
             extra={
@@ -99,7 +104,7 @@ class FilesService:
                     'file_id': file_id
                 }
             )
-            return False
+            raise ModuleException('Файл не найден', code=404)
 
         full_path = Path(__file__).resolve().parent.parent / self._upload / file.path / f"{file.name}.{file.extension}"
 
@@ -206,7 +211,7 @@ class FilesService:
                 'Файл не найден',
                 extra={'file_id': file_id},
             )
-            return None
+            raise ModuleException('Файл не найден', code=.404)
 
         base_dir = Path(__file__).resolve().parent.parent
 
@@ -221,14 +226,13 @@ class FilesService:
                 'Файл не найден на диске',
                 extra={'full_path': full_path},
             )
-            return None
+            raise ModuleException('Файл не найден', code=404)
 
         self._logger.info(
             'Файл готов к скачиванию',
             extra={'file_id': file_id},
         )
         return str(full_path), f'{file.name}.{file.extension}'
-
 
     def update_file(self, file_id, data) -> Files | None:
         data = UpdateModel.load(data)
@@ -242,7 +246,7 @@ class FilesService:
                 'Указанный файл не найден',
                 extra={'file_id': file_id},
             )
-            return None
+            raise ModuleException('Файл не найден', code=404)
 
         old_path = Path(__file__).resolve().parent.parent / self._upload / file.path
         if file.extension != '':
@@ -276,6 +280,7 @@ class FilesService:
                     'Старый файл не найден на диске',
                     extra={'old_file_path': old_path}
                 )
+                raise ModuleException('Файл не найден', code=404)
 
         file.update(data)
         file.updated_at = datetime.now(UTC)
