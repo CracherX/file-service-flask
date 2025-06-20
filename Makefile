@@ -5,9 +5,9 @@ CONTEXT = .
 tag = $(shell cat $(CONTEXT)/version.txt)
 
 IMAGE = $(IMAGE_NAME):$(tag)
-IMAGE_STATIC = $(IMAGE_NAME)-static:$(tag)
 
-all: build
+CONFIG_HOST = ./config.yaml
+CONFIG_CONTAINER = /config.yaml
 
 build:
 	@docker build -f $(DOCKERFILE) -t $(IMAGE) $(CONTEXT)
@@ -19,4 +19,4 @@ push:
 	@docker push $(IMAGE)
 
 run:
-	@docker run $(IMAGE)
+	@docker run --volume $(CONFIG_HOST):$(CONFIG_CONTAINER) $(IMAGE)
