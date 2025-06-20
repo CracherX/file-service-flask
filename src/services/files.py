@@ -1,15 +1,14 @@
-import os
 import dataclasses as dc
+import os
 from datetime import datetime, UTC
 from pathlib import Path
 from shutil import move
 from typing import Optional, List
 from uuid import uuid4
 
-from sqlalchemy.orm import Session as PGSession
-
 from base_module import ClassesLoggerAdapter, Model
 from models import Files
+from sqlalchemy.orm import Session as PGSession
 
 
 @dc.dataclass
@@ -87,8 +86,7 @@ class FilesService:
             )
             return False
 
-        full_path = Path(
-            __file__).resolve().parent.parent / self._upload / file.path / f"{file.name}.{file.extension}"
+        full_path = Path(__file__).resolve().parent.parent / self._upload / file.path / f"{file.name}.{file.extension}"
 
         if full_path.exists():
             os.remove(full_path)
@@ -266,7 +264,6 @@ class FilesService:
                     extra={'old_file_path': old_path}
                 )
 
-        tf = {f.name for f in dc.fields(file)}
         for f in dc.fields(data):
             value = getattr(data, f.name)
             if value is not None:

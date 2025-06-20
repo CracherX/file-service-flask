@@ -2,10 +2,10 @@ import os
 
 import flask
 
-from base_module import setup_logging, FormatDumps, ModuleException, BaseOrmMappedModel
-from models import Files  # noqa
-from injectors import pg
+from base_module import setup_logging, FormatDumps, ModuleException
 from config import config
+from injectors import pg
+from models import Files  # noqa
 from routers import file_router
 
 

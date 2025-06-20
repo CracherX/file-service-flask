@@ -3,12 +3,6 @@ import typing as t
 
 import flask
 import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy_utils import database_exists, create_database
-
-from config import config
-from models import Files  # noqa
-
 from base_module import (
     ModuleException,
     ClassesLoggerAdapter,
@@ -16,6 +10,10 @@ from base_module import (
     PgConfig,
     BaseOrmMappedModel
 )
+from config import config
+from models import Files  # noqa
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy_utils import database_exists, create_database
 
 
 class ConnectionsException(ModuleException):

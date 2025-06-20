@@ -3,9 +3,8 @@ import typing
 from datetime import datetime
 
 import sqlalchemy as sa
-from sqlalchemy import Index
-
 from base_module import BaseOrmMappedModel
+from sqlalchemy import Index
 
 
 @dc.dataclass

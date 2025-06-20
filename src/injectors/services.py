@@ -1,6 +1,7 @@
 from config import config
-from .connections import pg
+
 from services import FilesService
+from .connections import pg
 
 
 def files() -> FilesService:

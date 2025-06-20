@@ -1,4 +1,7 @@
+from .config import PgConfig, FilePgConfig
 from .exception import ModuleException
+from .flask import FormatDumps
+from .logger import LoggerConfig, ClassesLoggerAdapter, setup_logging
 from .model import (
     Model,
     ModelException,
@@ -7,7 +10,4 @@ from .model import (
     view,
     MetaModel
 )
-from .logger import LoggerConfig, ClassesLoggerAdapter, setup_logging
-from .config import PgConfig, FilePgConfig
-from .flask import FormatDumps
 from .singletons import Singleton, ThreadIsolatedSingleton

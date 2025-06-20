@@ -8,9 +8,9 @@ file_router = flask.Blueprint(
 
 
 @file_router.get('/files')
-def get_files():
+def get_files(files1=files()):
     """."""
-    fs = files()
+    fs = files1
     res = fs.list_files(
         page=int(flask.request.args.get('page')),
         page_size=int(flask.request.args.get('page_size')),
