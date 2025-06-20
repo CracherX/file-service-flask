@@ -261,10 +261,7 @@ class FilesService:
                     extra={'old_file_path': old_path}
                 )
 
-        for f in dc.fields(data):
-            value = getattr(data, f.name)
-            if value is not None:
-                setattr(file, f.name, value)
+        file.update(data)
         file.updated_at = datetime.now(UTC)
 
         self._pg.commit()
