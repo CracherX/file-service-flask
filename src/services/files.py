@@ -267,7 +267,7 @@ class FilesService:
                 raise ModuleException('Файл не найден', code=404)
 
         with self._pg.begin():
-            file.update(data.dump)
+            file.update(data.dump())
             file.updated_at = datetime.now(UTC)
 
         self._logger.info(
