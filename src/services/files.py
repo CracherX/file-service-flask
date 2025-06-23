@@ -1,7 +1,6 @@
 import dataclasses as dc
 import os
 from datetime import datetime, UTC
-from fileinput import close
 from pathlib import Path
 from shutil import move
 from typing import Optional, List
@@ -63,22 +62,23 @@ class FilesService:
             page_size = int(page_size)
         except:
             self._logger.info(
-                "Ошибка в параметрах URL",
+                'Ошибка в параметрах URL',
                 extra={
                     'page': page,
                     'page_size': page_size
                 }
             )
             raise ModuleException(
-                "Параметры не являются числами или не указаны вовсе",
+                'Параметры не являются числами или не указаны вовсе',
                 code=400
             )
 
         offset = (page - 1) * page_size
-        query = self._pg.query(Files)
-        if prefix:
-            query = query.filter(Files.path.contains(prefix))
-        return query.offset(offset).limit(page_size).all()
+        with self._pg.begin():
+            query = self._pg.query(Files)
+            if prefix:
+                query = query.filter(Files.path.contains(prefix))
+            return query.offset(offset).limit(page_size).all()
 
     def get_file(self, file_id: int) -> Files | None:
         self._logger.info(
@@ -87,7 +87,20 @@ class FilesService:
                 'file_id': file_id
             }
         )
-        return self._pg.query(Files).filter(Files.id == file_id).first()
+        with self._pg.begin():
+            file = self._pg.query(Files).filter(Files.id == file_id).first()
+            if file:
+                return file
+        self._logger.info(
+            'Файл не найден',
+            extra={
+                'file_id': file_id
+            }
+        )
+        raise ModuleException(
+            "Файл не найден",
+            code=404,
+        )
 
     def delete_file(self, file_id: int) -> None:
         self._logger.info(
@@ -97,14 +110,6 @@ class FilesService:
             }
         )
         file = self.get_file(file_id)
-        if not file:
-            self._logger.info(
-                'Файл не найден',
-                extra={
-                    'file_id': file_id
-                }
-            )
-            raise ModuleException('Файл не найден', code=404)
 
         full_path = Path(__file__).resolve().parent.parent / self._upload / file.path / f"{file.name}.{file.extension}"
 
@@ -123,11 +128,8 @@ class FilesService:
                     'file_id': file_id
                 }
             )
-
-        file_phys = self._pg.query(Files).filter(Files.id == file_id).first()
-        if file_phys:
+        with self._pg.begin():
             self._pg.delete(file)
-            self._pg.commit()
 
         self._logger.info(
             'Файл удалён',
@@ -136,7 +138,6 @@ class FilesService:
                 'file_path': full_path
             }
         )
-        return True
 
     def upload_file(self, file, path, comment) -> Files:
         self._logger.info(
@@ -195,9 +196,9 @@ class FilesService:
             path=data.path,
             comment=data.comment,
         )
-        self._pg.add(file)
-        self._pg.commit()
-        self._pg.refresh(file)
+        with self._pg.begin():
+            self._pg.add(file)
+
         return file
 
     def download_file(self, file_id: int) -> tuple[str, str] | None:
@@ -206,12 +207,6 @@ class FilesService:
             extra={'file_id': file_id},
         )
         file = self.get_file(file_id)
-        if not file:
-            self._logger.info(
-                'Файл не найден',
-                extra={'file_id': file_id},
-            )
-            raise ModuleException('Файл не найден', code=.404)
 
         base_dir = Path(__file__).resolve().parent.parent
 
@@ -241,12 +236,6 @@ class FilesService:
             extra={'file_id': file_id},
         )
         file = self.get_file(file_id)
-        if not file:
-            self._logger.info(
-                'Указанный файл не найден',
-                extra={'file_id': file_id},
-            )
-            raise ModuleException('Файл не найден', code=404)
 
         old_path = Path(__file__).resolve().parent.parent / self._upload / file.path
         if file.extension != '':
@@ -282,11 +271,9 @@ class FilesService:
                 )
                 raise ModuleException('Файл не найден', code=404)
 
-        file.update(data)
-        file.updated_at = datetime.now(UTC)
-
-        self._pg.commit()
-        self._pg.refresh(file)
+        with self._pg.begin():
+            file.update(data.__dict__)
+            file.updated_at = datetime.now(UTC)
 
         self._logger.info(
             'Файл обновлён в базе данных',

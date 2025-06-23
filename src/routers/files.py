@@ -63,5 +63,5 @@ def download_file(file_id):
 def update_file(file_id):
     """."""
     fs = files()
-    res = fs.update_file(file_id ,flask.request.json)
+    res = fs.update_file(file_id, flask.request.json)
     return flask.jsonify(res)
