@@ -111,7 +111,7 @@ class FilesService:
         )
         file = self.get_file(file_id)
 
-        full_path = Path(__file__).resolve().parent.parent / self._upload / file.path / f"{file.name}.{file.extension}"
+        full_path = Path(__file__) / self._upload / file.path / f"{file.name}.{file.extension}"
 
         if full_path.exists():
             os.remove(full_path)
@@ -162,10 +162,13 @@ class FilesService:
             comment=comment,
         )
 
-        path = Path(__file__).resolve().parent.parent / self._upload / data.path
+        path = Path(self._upload).resolve() / data.path
         path.mkdir(parents=True, exist_ok=True)
 
-        file_path = path / f"{data.name}.{data.extension}"
+        if data.extension:
+            file_path = path / f'{data.name}.{data.extension}'
+        else:
+            file_path = path / data.name
 
         if file_path.exists():
             self._logger.warning(
@@ -208,9 +211,7 @@ class FilesService:
         )
         file = self.get_file(file_id)
 
-        base_dir = Path(__file__).resolve().parent.parent
-
-        full_path = base_dir / self._upload / file.path
+        full_path = Path(self._upload).resolve() / self._upload / file.path
         if file.extension != '':
             full_path = full_path / f'{file.name}.{file.extension}'
         else:
@@ -237,7 +238,7 @@ class FilesService:
         )
         file = self.get_file(file_id)
 
-        old_path = Path(__file__).resolve().parent.parent / self._upload / file.path
+        old_path = Path(self._upload).resolve() / file.path
         if file.extension != '':
             old_path = old_path / f'{file.name}.{file.extension}'
         else:
@@ -245,7 +246,7 @@ class FilesService:
 
         new_name = data.name or file.name
         new_path = data.path or file.path
-        new_file_path = Path(__file__).resolve().parent.parent / self._upload / new_path
+        new_file_path = Path(self._upload).resolve() / new_path
         new_file_path.mkdir(parents=True, exist_ok=True)
 
         if file.extension != '':
