@@ -79,7 +79,7 @@ upload_dir: "/uploads"
 ### Получить список файлов
 
 ```
-GET /api/files
+GET /api/files/file
 ```
 
 - Возвращает список файлов с пагинацией и фильтрацией по пути.
@@ -96,7 +96,7 @@ GET /api/files
 ### Получить файл по ID
 
 ```
-GET /api/file/<int:file_id>
+GET /api/files/file/<int:file_id>
 ```
 
 - Возвращает информацию о файле по его ID.
@@ -106,7 +106,7 @@ GET /api/file/<int:file_id>
 ### Удалить файл
 
 ```
-DELETE /api/file/<int:file_id>
+DELETE /api/files/file/<int:file_id>
 ```
 
 - Удаляет файл по ID.
@@ -116,7 +116,7 @@ DELETE /api/file/<int:file_id>
 ### Обновить данные файла
 
 ```
-PATCH /api/file
+PATCH /api/files/file
 ```
 
 - Обновляет название, путь и/или комментарий к файлу, а так же расположение файла в хранилище.
@@ -135,7 +135,7 @@ PATCH /api/file
 ### Загрузить файл
 
 ```
-POST /api/file
+POST /api/files/file
 ```
 - form-data
 - Параметры формы:
@@ -151,7 +151,7 @@ POST /api/file
 ### Скачать файл
 
 ```
-GET /api/file/<int:file_id>/download
+GET /api/files/file/<int:file_id>/download
 ```
 
 - Скачивает файл по ID.
