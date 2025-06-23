@@ -11,7 +11,6 @@ from base_module import (
     BaseOrmMappedModel
 )
 from config import config
-from models import Files  # noqa
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy_utils import database_exists, create_database
 

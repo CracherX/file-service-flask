@@ -11,7 +11,7 @@ from base_module import (
     Model,
     ModuleException
 )
-from models import Files
+from models import File
 from sqlalchemy.orm import Session as PGSession
 
 
@@ -48,7 +48,7 @@ class FilesService:
             page: str = 1,
             page_size: str = 100,
             prefix: Optional[str] = None
-    ) -> List[Files]:
+    ) -> List[File]:
 
         self._logger.info(
             'Запрошен список файлов',
@@ -75,12 +75,12 @@ class FilesService:
 
         offset = (page - 1) * page_size
         with self._pg.begin():
-            query = self._pg.query(Files)
+            query = self._pg.query(File)
             if prefix:
-                query = query.filter(Files.path.contains(prefix))
+                query = query.filter(File.path.contains(prefix))
             return query.offset(offset).limit(page_size).all()
 
-    def get_file(self, file_id: int) -> Files | None:
+    def get_file(self, file_id: int) -> File | None:
         self._logger.info(
             'Запрошен файл',
             extra={
@@ -88,7 +88,7 @@ class FilesService:
             }
         )
         with self._pg.begin():
-            file = self._pg.query(Files).filter(Files.id == file_id).first()
+            file = self._pg.query(File).filter(File.id == file_id).first()
             if file:
                 return file
         self._logger.info(
@@ -111,7 +111,7 @@ class FilesService:
         )
         file = self.get_file(file_id)
 
-        full_path = Path(__file__) / self._upload / file.path / f"{file.name}.{file.extension}"
+        full_path = file.get_path(self._upload)
 
         if full_path.exists():
             os.remove(full_path)
@@ -139,7 +139,7 @@ class FilesService:
             }
         )
 
-    def upload_file(self, file, path, comment) -> Files:
+    def upload_file(self, file, path, comment) -> File:
         self._logger.info(
             'Загрузка файла',
             extra={
@@ -179,7 +179,10 @@ class FilesService:
             )
             unique_suffix = uuid4().hex[:8]
             new_name = f'{data.name}_{unique_suffix}'
-            file_path = path / f'{new_name}.{data.extension}'
+            if data.extension:
+                file_path = path / f'{new_name}.{data.extension}'
+            else:
+                file_path = path / new_name
             data.name = new_name
 
         with open(file_path, 'wb') as f:
@@ -192,7 +195,7 @@ class FilesService:
             }
         )
 
-        file = Files(
+        file = File(
             name=data.name,
             extension=data.extension,
             size=data.size,
@@ -210,12 +213,7 @@ class FilesService:
             extra={'file_id': file_id},
         )
         file = self.get_file(file_id)
-
-        full_path = Path(self._upload).resolve() / self._upload / file.path
-        if file.extension != '':
-            full_path = full_path / f'{file.name}.{file.extension}'
-        else:
-            full_path = full_path / file.name
+        full_path = file.get_path(self._upload)
 
         if not full_path.exists():
             self._logger.warning(
@@ -230,7 +228,7 @@ class FilesService:
         )
         return str(full_path), f'{file.name}.{file.extension}'
 
-    def update_file(self, file_id, data) -> Files | None:
+    def update_file(self, file_id, data) -> File | None:
         data = UpdateModel.load(data)
         self._logger.info(
             'Начало обновления файла',
@@ -238,11 +236,7 @@ class FilesService:
         )
         file = self.get_file(file_id)
 
-        old_path = Path(self._upload).resolve() / file.path
-        if file.extension != '':
-            old_path = old_path / f'{file.name}.{file.extension}'
-        else:
-            old_path = old_path / file.name
+        old_path = file.get_path(self._upload)
 
         new_name = data.name or file.name
         new_path = data.path or file.path
@@ -273,7 +267,7 @@ class FilesService:
                 raise ModuleException('Файл не найден', code=404)
 
         with self._pg.begin():
-            file.update(data.__dict__)
+            file.update(data.dump)
             file.updated_at = datetime.now(UTC)
 
         self._logger.info(
