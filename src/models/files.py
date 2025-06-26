@@ -4,8 +4,10 @@ from datetime import datetime
 from pathlib import Path
 
 import sqlalchemy as sa
+
 from base_module import BaseOrmMappedModel
 from sqlalchemy import Index
+from sqlalchemy.orm import registry
 
 
 @dc.dataclass

@@ -3,6 +3,9 @@ import typing as t
 
 import flask
 import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy_utils import database_exists, create_database
+
 from base_module import (
     ModuleException,
     ClassesLoggerAdapter,
@@ -10,9 +13,6 @@ from base_module import (
     PgConfig,
     BaseOrmMappedModel
 )
-from config import config
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy_utils import database_exists, create_database
 
 
 class ConnectionsException(ModuleException):

@@ -2,11 +2,11 @@ app_host: "0.0.0.0"
 app_port: 80
 
 pg:
-  host: "db"
+  host: "db_files"
   port: 5432
   user: "test"
   password: "123"
-  database: "test"
+  database: "test_files"
 
 logging:
   root_log_level: 10

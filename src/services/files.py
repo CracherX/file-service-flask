@@ -102,7 +102,7 @@ class FilesService:
             code=404,
         )
 
-    def delete_file(self, file_id: int) -> None:
+    def delete_file(self, file_id: int) -> bool:
         self._logger.info(
             'Удаление файла',
             extra={
@@ -138,6 +138,7 @@ class FilesService:
                 'file_path': full_path
             }
         )
+        return True
 
     def upload_file(self, file, path, comment) -> File:
         self._logger.info(
