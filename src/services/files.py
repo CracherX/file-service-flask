@@ -19,10 +19,10 @@ from sqlalchemy.orm import Session as PGSession
 class CreationModel(Model):
     """."""
     name: str = dc.field()
-    extension: Optional[str] = dc.field()
     size: int = dc.field()
-    path: str = dc.field()
-    comment: Optional[str] = dc.field()
+    extension: Optional[str] = dc.field(default=None)
+    path: Optional[str] = dc.field(default=None)
+    comment: Optional[str] = dc.field(default=None)
 
 
 @dc.dataclass
